@@ -1,9 +1,6 @@
 package com.wsh.jvm.classloader02;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * @Description: 加密工具类
@@ -12,24 +9,29 @@ import java.io.IOException;
  */
 public class EncrptUtil {
     public static void main(String[] args) {
-        encrpt(new File("d:/java/com/wsh/Test.class"), new File("d:/java/temp/com/wsh/Test.class"));
+        encryptClass(new File("d:/java/com/wsh/Test.class"), new File("d:/java/temp/com/wsh/Test.class"));
     }
 
-    public static void encrpt(File src, File dest) {
-
-        FileInputStream fileInputStream = null;
-        FileOutputStream fileOutputStream = null;
+    /**
+     * 加密方法
+     *
+     * @param src  源文件路径
+     * @param dest 目标文件路径
+     */
+    public static void encryptClass(File src, File dest) {
+        InputStream fileInputStream = null;
+        OutputStream fileOutputStream = null;
 
         try {
             fileInputStream = new FileInputStream(src);
             fileOutputStream = new FileOutputStream(dest);
 
+            //接收长度
             int len;
             while ((len = fileInputStream.read()) != -1) {
-                //取反
+                //通过异或操作对读取的输入流进行取反
                 fileOutputStream.write(len ^ 0xff);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

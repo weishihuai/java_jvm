@@ -7,13 +7,13 @@ import java.io.*;
  * @Author: weishihuai
  * @Date: 2019/1/16 21:36
  */
-public class DecrptClassLoader extends ClassLoader {
+public class DecipherClassLoader extends ClassLoader {
     /**
      * 根目录路径
      */
     private String rootDir;
 
-    public DecrptClassLoader(String rootDir) {
+    public DecipherClassLoader(String rootDir) {
         this.rootDir = rootDir;
     }
 
@@ -24,6 +24,8 @@ public class DecrptClassLoader extends ClassLoader {
         if (null == loadedClass) {
             //如果未装载,依据双亲委托机制,寻找父类加载器进行加载
             ClassLoader parent = this.getParent();
+
+            //这里加try-catch的原因是怕父类加载器加载失败之后,报错就不会执行下面的代码.
             try {
                 loadedClass = parent.loadClass(name);
             } catch (Exception e) {
@@ -56,19 +58,20 @@ public class DecrptClassLoader extends ClassLoader {
      * @param name 路径
      * @return
      */
-    private byte[] getClassData(String name) {  //com.wsh.Test  d:/java/com/wsh/Test.class
+    private byte[] getClassData(String name) {
         StringBuilder path = new StringBuilder(rootDir).append(File.separator).append(name.replace(".", File.separator)).append(".class");
         ByteArrayOutputStream byteArrayOutputStream = null;
         InputStream inputStream = null;
+        byte[] data = null;
         try {
             inputStream = new FileInputStream(path.toString());
-
+            byteArrayOutputStream = new ByteArrayOutputStream();
             int len;
             while ((len = inputStream.read()) != -1) {
-                //取反
+                //对加密后的二进制文件再次取反就是解密
                 byteArrayOutputStream.write(len ^ 0xff);
             }
-            return byteArrayOutputStream.toByteArray();
+            data = byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -87,6 +90,6 @@ public class DecrptClassLoader extends ClassLoader {
                 }
             }
         }
-        return null;
+        return data;
     }
 }
